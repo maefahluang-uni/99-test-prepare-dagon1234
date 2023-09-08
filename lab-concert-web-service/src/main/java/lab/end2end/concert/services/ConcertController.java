@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -27,51 +28,60 @@ public class ConcertController {
     private ConcertRepository concertRepository;
 
     @GetMapping("/concerts/{id}")
-    public ResponseEntity<Concert> retrieveConcert(@PathVariable Long id) {
-        Optional<Concert> concert = concertRepository.findById(id);
-        if (concert.isPresent()) {
-            return new ResponseEntity<>(concert.get(), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<String> retrieveConcert(@PathVariable Long id) {
+
+        Optional<Concert> optConcert = concertRepository.findById(id);
+
+        if (!optConcert.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ID not found");
         }
+        optConcert.get();
+
+        return ResponseEntity.status(HttpStatus.CONTINUE).body("Success Getting");
+
     }
 
-    @GetMapping
-    public ResponseEntity<List<Concert>> retrieveAllConcerts() {
-        List<Concert> concerts = concertRepository.findAll();
-        return new ResponseEntity<>(concerts, HttpStatus.OK);
+    @GetMapping("/concerts")
+    public ResponseEntity<List<Concert>> retrieveAllConcert() {
+
+        concertRepository.findAll();
+        return new ResponseEntity<>(HttpStatus.CONTINUE);
+
     }
 
-    @PostMapping
-    public ResponseEntity<Concert> createConcert(@RequestBody Concert concert) {
-        Concert createdConcert = concertRepository.save(concert);
-        return new ResponseEntity<>(createdConcert, HttpStatus.CREATED);
+    @PostMapping("/concerts")
+    public ResponseEntity<String> createConcert(@RequestBody Concert concert) {
+
+        concertRepository.save(concert);
+        return ResponseEntity.status(HttpStatus.CREATED).body("COncert created");
+
     }
 
-    @PutMapping("/concerts/{id}")
-    public ResponseEntity<Concert> updateConcert(@PathVariable Long id, @RequestBody Concert concert) {
-        if (!concertRepository.existsById(id)) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    @PutMapping("concerts/{id}")
+    public ResponseEntity<String> updateConcert(@RequestBody Concert concert) {
+
+        concertRepository.save(concert);
+        return new ResponseEntity<>(HttpStatus.valueOf(200));
+    }
+
+    @DeleteMapping("/concert/{id}")
+    public ResponseEntity<String> delete(@PathVariable long id) {
+        Optional<Concert> optConcert = concertRepository.findById(id);
+
+        if (!optConcert.isPresent()) {
+            return ResponseEntity.status(HttpStatus.valueOf(404)).body("Not found this id");
         }
-
-        concert.setId(id);
-        Concert updatedConcert = concertRepository.save(concert);
-        return new ResponseEntity<>(updatedConcert, HttpStatus.OK);
-    }
-
-    @DeleteMapping("/concerts/{id}")
-    public ResponseEntity<Void> deleteConcert(@PathVariable Long id) {
-        if (!concertRepository.existsById(id)) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
         concertRepository.deleteById(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+        return new ResponseEntity<>(HttpStatus.CONTINUE);
+
     }
 
-    @DeleteMapping
-    public ResponseEntity<Void> deleteAllConcerts() {
+    @DeleteMapping("/concerts")
+    public ResponseEntity<String> deleteAllConcerts() {
+
         concertRepository.deleteAll();
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+        return ResponseEntity.status(HttpStatus.CONTINUE).body("Delete Success");
     }
 }

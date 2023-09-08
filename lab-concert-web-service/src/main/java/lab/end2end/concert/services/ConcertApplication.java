@@ -8,7 +8,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @SpringBootApplication
-@EntityScan(basePackages = { "lab.end2end.concert.domain" })
+@EntityScan(basePackages = "lab.end2end.concert.domain")
 public class ConcertApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(ConcertApplication.class, args);
@@ -19,8 +19,7 @@ public class ConcertApplication {
 		return new WebMvcConfigurer() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
-				// TODO: make sure the port of web front is correct.
-				registry.addMapping("/concerts").allowedOrigins("http://localhost:8081");
+				registry.addMapping("/concerts").allowedOrigins("http://localhost:8080");
 			}
 		};
 	}
