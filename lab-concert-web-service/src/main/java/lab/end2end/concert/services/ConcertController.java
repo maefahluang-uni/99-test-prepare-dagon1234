@@ -23,57 +23,55 @@ public class ConcertController {
 
     private static Logger LOGGER = LoggerFactory.getLogger(ConcertController.class);
 
-    // TODO: add repository
+    @Autowired
+    private ConcertRepository concertRepository;
 
-    // TODO: add @GET and @Path
-    public ResponseEntity<Concert> retrieveConcert(long id) { // TODO: add @PathVariable for id
-
-        // TODO: find concert by ID suing em.find(...
-
-        // TODO: Handle the case when no entity is found
-
-        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-
+    @GetMapping("/concerts/{id}")
+    public ResponseEntity<Concert> retrieveConcert(@PathVariable Long id) {
+        Optional<Concert> concert = concertRepository.findById(id);
+        if (concert.isPresent()) {
+            return new ResponseEntity<>(concert.get(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
-    // TODO: add @GET and @Path
-    public ResponseEntity<List<Concert>> retrieveAllConcert() {
-        // TODO: get all concert
-        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-
+    @GetMapping
+    public ResponseEntity<List<Concert>> retrieveAllConcerts() {
+        List<Concert> concerts = concertRepository.findAll();
+        return new ResponseEntity<>(concerts, HttpStatus.OK);
     }
 
-    // TODO: add proper annotation Post verb
-    public ResponseEntity<String> createConcert(Concert concert) { // add @ResponseBody
-
-        // TODO save concert to database using repository
-        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-
+    @PostMapping
+    public ResponseEntity<Concert> createConcert(@RequestBody Concert concert) {
+        Concert createdConcert = concertRepository.save(concert);
+        return new ResponseEntity<>(createdConcert, HttpStatus.CREATED);
     }
 
-    // TODO: add proper annotation Put verb
-    public ResponseEntity<String> updateConcert(Concert concert) { // add @ResponseBody
+    @PutMapping("/concerts/{id}")
+    public ResponseEntity<Concert> updateConcert(@PathVariable Long id, @RequestBody Concert concert) {
+        if (!concertRepository.existsById(id)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
 
-        // TODO update concert using em.merge(..
-        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        concert.setId(id);
+        Concert updatedConcert = concertRepository.save(concert);
+        return new ResponseEntity<>(updatedConcert, HttpStatus.OK);
     }
 
-    // TODO: add annotation for Delete verb and and @Path for id
-    public ResponseEntity<String> delete(long id) { // TODO: add @PathVariable for id
+    @DeleteMapping("/concerts/{id}")
+    public ResponseEntity<Void> deleteConcert(@PathVariable Long id) {
+        if (!concertRepository.existsById(id)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
 
-        // TODO: delete concert using em.remove
-
-        // TODO: Return a HTTP 404 response if the specified Concert isn't found.
-
-        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-
+        concertRepository.deleteById(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    // TODO: add annotation for Delete verb
-    public ResponseEntity<String> deleteAllConcerts() {
-
-        // TODO: query to get all concerts into a list using guideline in the reference
-
-        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    @DeleteMapping
+    public ResponseEntity<Void> deleteAllConcerts() {
+        concertRepository.deleteAll();
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
