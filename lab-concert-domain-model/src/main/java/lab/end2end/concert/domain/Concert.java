@@ -23,7 +23,8 @@ public class Concert {
 
     private LocalDateTime date;
 
-    @ManyToOne(cascade = CascadeType.MERGE)
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "performer_id", referencedColumnName = "id")
     private Performer performer;
 
     public Concert(Long id, String title, LocalDateTime date, Performer performer) {
